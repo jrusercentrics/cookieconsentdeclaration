@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cookiebot Test</title>
+</head>
+<body>
+  <h1>Cookiebot Inline Test</h1>
+  <p>Abre o console para ver os logs.</p>
+
+  <!-- Cookiebot CMP script -->
+  <script 
+    id="Cookiebot"
+    src="https://consent.cookiebot.com/uc.js"
+    data-cbid="e2769309-3672-42d4-bc3f-d56333e6a880"
+    data-blockingmode="auto"
+    type="text/javascript">
+  </script>
+
+  <!-- Test script -->
+  <script>
+  window.addEventListener("CookieConsentDeclaration", function () {
+    console.log("✅ CookieConsentDeclaration fired!");
+    console.log("🌍 User country:", Cookiebot.userCountry);
+
+    // Mostrar estados de consentimento
+    console.log("Necessary:", Cookiebot.consent.necessary);
+    console.log("Preferences:", Cookiebot.consent.preferences);
+    console.log("Statistics:", Cookiebot.consent.statistics);
+    console.log("Marketing:", Cookiebot.consent.marketing);
+
+    // Se for US com consentimento já granted → push imediato no dataLayer
+    if (Cookiebot.userCountry && Cookiebot.userCountry.toUpperCase().includes("US")) {
+      if (Cookiebot.consent.marketing && Cookiebot.consent.statistics) {
+        console.log("🇺🇸 US user with granted default consent → firing GTM event");
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "cookie_consent_ready",
+          consentRegion: "US",
+          consentType: "default_granted"
+        });
+      } else {
+        console.log("🇺🇸 US user but consent not granted by default");
+      }
+    } else {
+      console.log("🌐 Non-US user → waiting for user interaction");
+    }
+  });
+  </script>
+</body>
+</html>
